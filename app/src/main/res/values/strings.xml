@@ -1,3 +1,6 @@
 <resources>
     <string name="app_name">PruebaTecnica_PabloCastrillon</string>
+    <string name="dowload_video">Download Video</string>
+    <string name="permission_granted">Permission Granted</string>
+    <string name="permission_denied">Permission Denied</string>
 </resources>
