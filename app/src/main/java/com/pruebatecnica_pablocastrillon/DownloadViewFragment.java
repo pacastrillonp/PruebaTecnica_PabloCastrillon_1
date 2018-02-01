@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.PowerManager;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -71,6 +72,7 @@ public class DownloadViewFragment extends Fragment implements View.OnClickListen
         private Context context;
         private PowerManager.WakeLock mWakeLock;
 
+
         public DownloadVideo(Context context) {
             this.context = context;
         }
@@ -98,10 +100,53 @@ public class DownloadViewFragment extends Fragment implements View.OnClickListen
 
                 // download the file
                 input = connection.getInputStream();
-                String rout = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Media/";
-                File video = new File(rout, "Arkbox.mp4");
-                video.mkdir();
-                output = new FileOutputStream(video);
+
+
+                output = new FileOutputStream( "Arkbox.mp4");
+
+                // creando folder
+
+
+//                if (isExternalStorageWritable() || isExternalStorageReadable())
+//
+//
+//                    File video = new File(getMedeiatorageDir("Media"), "Arkbox.mp4");
+//                    try {
+//                        output = new FileOutputStream(video);
+//
+//                    } catch (Exception e) {
+//                        e.printStackTrace();
+//                    }
+//
+//                }
+
+
+//
+//                File mediaFolder = new File(Environment.getExternalStorageDirectory() + "/Media/");
+//                File media = new File(Environment.getExternalStorageDirectory() + "/Media/" + "Arkbox.mp4");
+//
+//                if (!mediaFolder.exists()) {
+//                    mediaFolder.mkdir();
+//                }
+//
+//
+//                File video = new File(new File(Environment.getExternalStorageDirectory() + "/Media/"), "Arkbox.mp4");
+//                if (video.exists()) {
+//                    video.delete();
+//                }
+//                try {
+//                    output = new FileOutputStream(video);
+//                    output.flush();
+//                    output.close();
+//                } catch (Exception e) {
+//                    e.printStackTrace();
+//                }
+//
+//    File video = new File(mediaFolder.getAbsolutePath(), "Arkbox.mp4");
+//
+
+//                output = new FileOutputStream(video);
+
 
                 byte data[] = new byte[4096];
                 long total = 0;
@@ -145,6 +190,7 @@ public class DownloadViewFragment extends Fragment implements View.OnClickListen
             mWakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,
                     getClass().getName());
             mWakeLock.acquire();
+            getMedeiatorageDir("Media");
         }
 
 
@@ -173,4 +219,31 @@ public class DownloadViewFragment extends Fragment implements View.OnClickListen
         }
     }
 
+
+    public boolean isExternalStorageWritable() {
+        String state = Environment.getExternalStorageState();
+        if (Environment.MEDIA_MOUNTED.equals(state)) {
+            return true;
+        }
+        return false;
+    }
+
+    public boolean isExternalStorageReadable() {
+        String state = Environment.getExternalStorageState();
+        if (Environment.MEDIA_MOUNTED.equals(state) ||
+                Environment.MEDIA_MOUNTED_READ_ONLY.equals(state)) {
+            return true;
+        }
+        return false;
+    }
+
+    public File getMedeiatorageDir(String mediaName) {
+        // Get the directory for the user's public pictures directory.
+        File file = new File(Environment.getExternalStorageDirectory(), mediaName);
+        if (!file.mkdirs()) {
+            Toast.makeText(getContext(), "Directory not created", Toast.LENGTH_SHORT).show();
+//            Log.e(LOG_TAG, "Directory not created");
+        }
+        return file;
+    }
 }
