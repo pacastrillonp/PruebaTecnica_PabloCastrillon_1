@@ -12,7 +12,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
+
+import com.pruebatecnica_pablocastrillon.Network.WebService;
+import com.pruebatecnica_pablocastrillon.model.GetNotification;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -22,6 +26,8 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+import javax.xml.transform.Templates;
+
 /**
  * Created by pablo.castrillon on 31/01/2018.
  */
@@ -30,8 +36,24 @@ public class DownloadViewFragment extends Fragment implements View.OnClickListen
 
     private Button buttonDowloadVideo;
     private ProgressBar progressBarVideoDownload;
-
+    private TextView textViewDowloadVideo;
     private ProgressBar progressBar;
+private GetNotification getNotification;
+    private WebService webService;
+
+
+
+
+   public TextView getTextView() {
+        return textView;
+    }
+
+    public void setTextView(TextView textView) {
+        this.textView = textView;
+    }
+
+    private TextView textView;
+
 
     public ProgressBar getProgressBar() {
         return progressBar;
@@ -48,6 +70,8 @@ public class DownloadViewFragment extends Fragment implements View.OnClickListen
 
         buttonDowloadVideo = (Button) view.findViewById(R.id.bt_download_video);
         progressBarVideoDownload = (ProgressBar) view.findViewById(R.id.pb_download_video);
+        textViewDowloadVideo = (TextView) view.findViewById(R.id.tv_download_video);
+        webService = new WebService(getContext());
         buttonDowloadVideo.setOnClickListener(this);
         return view;
     }
@@ -58,7 +82,14 @@ public class DownloadViewFragment extends Fragment implements View.OnClickListen
             case (R.id.bt_download_video):
                 progressBarVideoDownload.setVisibility(View.VISIBLE);
                 setProgressBar(progressBarVideoDownload);
+                setTextView(textViewDowloadVideo);
                 final DownloadVideo downloadLogTask = new DownloadVideo(getActivity());
+
+
+//                getNotification = new GetNotification();
+//                webService.postNotificationRequest(getNotification);
+
+
                 downloadLogTask.execute("https://s3.amazonaws.com/tekus/media/Arkbox.mp4");
                 buttonDowloadVideo.setEnabled(false);
                 break;
@@ -101,51 +132,9 @@ public class DownloadViewFragment extends Fragment implements View.OnClickListen
                 // download the file
                 input = connection.getInputStream();
 
+                File video = new File(Environment.getExternalStorageDirectory().getPath() + "/Media/","Arkbox.mp4");
+                output = new FileOutputStream(video);
 
-                output = new FileOutputStream( "Arkbox.mp4");
-
-                // creando folder
-
-
-//                if (isExternalStorageWritable() || isExternalStorageReadable())
-//
-//
-//                    File video = new File(getMedeiatorageDir("Media"), "Arkbox.mp4");
-//                    try {
-//                        output = new FileOutputStream(video);
-//
-//                    } catch (Exception e) {
-//                        e.printStackTrace();
-//                    }
-//
-//                }
-
-
-//
-//                File mediaFolder = new File(Environment.getExternalStorageDirectory() + "/Media/");
-//                File media = new File(Environment.getExternalStorageDirectory() + "/Media/" + "Arkbox.mp4");
-//
-//                if (!mediaFolder.exists()) {
-//                    mediaFolder.mkdir();
-//                }
-//
-//
-//                File video = new File(new File(Environment.getExternalStorageDirectory() + "/Media/"), "Arkbox.mp4");
-//                if (video.exists()) {
-//                    video.delete();
-//                }
-//                try {
-//                    output = new FileOutputStream(video);
-//                    output.flush();
-//                    output.close();
-//                } catch (Exception e) {
-//                    e.printStackTrace();
-//                }
-//
-//    File video = new File(mediaFolder.getAbsolutePath(), "Arkbox.mp4");
-//
-
-//                output = new FileOutputStream(video);
 
 
                 byte data[] = new byte[4096];
@@ -190,7 +179,12 @@ public class DownloadViewFragment extends Fragment implements View.OnClickListen
             mWakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,
                     getClass().getName());
             mWakeLock.acquire();
-            getMedeiatorageDir("Media");
+
+
+            if (isExternalStorageReadable() && isExternalStorageWritable() ){
+                getMedeiatorageDir("Media");
+            }
+
         }
 
 
@@ -201,6 +195,8 @@ public class DownloadViewFragment extends Fragment implements View.OnClickListen
             getProgressBar().setIndeterminate(false);
             getProgressBar().setMax(100);
             getProgressBar().setProgress(progress[0]);
+
+            getTextView().setText(String.valueOf(progress[0]) + " %" );
         }
 
         @Override
@@ -241,8 +237,7 @@ public class DownloadViewFragment extends Fragment implements View.OnClickListen
         // Get the directory for the user's public pictures directory.
         File file = new File(Environment.getExternalStorageDirectory(), mediaName);
         if (!file.mkdirs()) {
-            Toast.makeText(getContext(), "Directory not created", Toast.LENGTH_SHORT).show();
-//            Log.e(LOG_TAG, "Directory not created");
+            Log.e("Directory not created", "Directory not created");
         }
         return file;
     }
