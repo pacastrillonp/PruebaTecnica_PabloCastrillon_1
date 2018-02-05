@@ -42,6 +42,7 @@ public class DownloadViewFragment extends Fragment implements View.OnClickListen
     private ProgressBar progressBar;
     private GetNotification getNotification;
     private WebService webService;
+    private DownLoadFinishListener downLoadFinishListener;
 
 
     private VideoPlayerFragment videoPlayerFragment;
@@ -67,6 +68,13 @@ public class DownloadViewFragment extends Fragment implements View.OnClickListen
         this.progressBar = progressBar;
     }
 
+    public DownLoadFinishListener getDownLoadFinishListener() {
+        return downLoadFinishListener;
+    }
+
+    public void setDownLoadFinishListener(DownLoadFinishListener downLoadFinishListener) {
+        this.downLoadFinishListener = downLoadFinishListener;
+    }
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
@@ -211,9 +219,11 @@ public class DownloadViewFragment extends Fragment implements View.OnClickListen
             } else {
                 Toast.makeText(context, "File downloaded", Toast.LENGTH_SHORT).show();
                 getProgressBar().setVisibility(View.GONE);
+                downLoadFinishListener.PlayVideo();
+
                 buttonDowloadVideo.setEnabled(true);
-                videoPlayerFragment = new VideoPlayerFragment();
-                addFragment(videoPlayerFragment, VideoPlayerFragmentTag);
+//                videoPlayerFragment = new VideoPlayerFragment();
+//                addFragment(videoPlayerFragment, VideoPlayerFragmentTag);
             }
 
 
@@ -270,5 +280,10 @@ public class DownloadViewFragment extends Fragment implements View.OnClickListen
         }
     }
 
+    public interface DownLoadFinishListener {
+        void PlayVideo ();
+
+
+    }
 
 }

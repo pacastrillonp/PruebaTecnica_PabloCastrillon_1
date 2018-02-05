@@ -1,6 +1,7 @@
 package com.pruebatecnica_pablocastrillon;
 
 import android.Manifest;
+import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Environment;
@@ -10,32 +11,38 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Toast;
 
 import java.io.File;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements DownloadViewFragment.DownLoadFinishListener {
 
-   private  DownloadViewFragment downloadViewFragment;
-   private  VideoPlayerFragment videoPlayerFragment;
-   private String VideoPlayerFragmentTag = "VideoPlayerFragmentTag";
-   private String DownloadViewFragmenTag = "DownloadViewFragmenTag";
+    private DownloadViewFragment downloadViewFragment;
+    private VideoPlayerFragment videoPlayerFragment;
+    private String VideoPlayerFragmentTag = "VideoPlayerFragmentTag";
+    private String DownloadViewFragmenTag = "DownloadViewFragmenTag";
     private static final int MY_PERMISSIONS_REQUEST = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if (savedInstanceState == null){
+        if (savedInstanceState == null) {
+//            requestWindowFeature(Window.FEATURE_NO_TITLE);
+//            getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,WindowManager.LayoutParams.FLAG_FULLSCREEN);
             setContentView(R.layout.activity_main);
 
             File dir = new File(Environment.getExternalStorageDirectory().getPath() + "/Media/Arkbox.mp4");
-            if (dir.exists() ){
+            if (dir.exists()) {
+                setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
                 videoPlayerFragment = new VideoPlayerFragment();
-                addFragment(videoPlayerFragment,VideoPlayerFragmentTag);
-            }else {
+                addFragment(videoPlayerFragment, VideoPlayerFragmentTag);
+            } else {
                 downloadViewFragment = new DownloadViewFragment();
-                addFragment(downloadViewFragment,DownloadViewFragmenTag);
+                downloadViewFragment.setDownLoadFinishListener(this);
+                addFragment(downloadViewFragment, DownloadViewFragmenTag);
 
             }
 
@@ -48,8 +55,6 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
-
-
 
 
     public void addFragment(android.support.v4.app.Fragment fragment, String tag) {
@@ -69,8 +74,15 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+    private void removeFragment(String tag) {
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        android.support.v4.app.Fragment fragment = fragmentManager.findFragmentByTag(tag);
+        FragmentTransaction transaction = fragmentManager.beginTransaction();
 
+        transaction.remove(fragment);
 
+        transaction.commitAllowingStateLoss();
+    }
 
     private void verifyPermission() {
 
@@ -118,4 +130,12 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    @Override
+    public void PlayVideo() {
+        removeFragment(DownloadViewFragmenTag);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+
+        videoPlayerFragment = new VideoPlayerFragment();
+        addFragment(videoPlayerFragment, VideoPlayerFragmentTag);
+    }
 }
