@@ -3,6 +3,7 @@ package com.pruebatecnica_pablocastrillon;
 import android.Manifest;
 import android.content.pm.PackageManager;
 import android.os.Build;
+import android.os.Environment;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -11,9 +12,13 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.widget.Toast;
 
+import java.io.File;
+
 public class MainActivity extends AppCompatActivity {
 
    private  DownloadViewFragment downloadViewFragment;
+   private  VideoPlayerFragment videoPlayerFragment;
+   private String VideoPlayerFragmentTag = "VideoPlayerFragmentTag";
    private String DownloadViewFragmenTag = "DownloadViewFragmenTag";
     private static final int MY_PERMISSIONS_REQUEST = 0;
 
@@ -24,9 +29,18 @@ public class MainActivity extends AppCompatActivity {
         if (savedInstanceState == null){
             setContentView(R.layout.activity_main);
 
-            downloadViewFragment = new DownloadViewFragment();
+            File dir = new File(Environment.getExternalStorageDirectory().getPath() + "/Media/Arkbox.mp4");
+            if (dir.exists() ){
+                videoPlayerFragment = new VideoPlayerFragment();
+                addFragment(videoPlayerFragment,VideoPlayerFragmentTag);
+            }else {
+                downloadViewFragment = new DownloadViewFragment();
+                addFragment(downloadViewFragment,DownloadViewFragmenTag);
 
-            addFragment(downloadViewFragment,DownloadViewFragmenTag);
+            }
+
+
+
 
             if (Build.VERSION.SDK_INT >= 23) {
                 verifyPermission();

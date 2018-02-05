@@ -6,6 +6,8 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.PowerManager;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -38,13 +40,15 @@ public class DownloadViewFragment extends Fragment implements View.OnClickListen
     private ProgressBar progressBarVideoDownload;
     private TextView textViewDowloadVideo;
     private ProgressBar progressBar;
-private GetNotification getNotification;
+    private GetNotification getNotification;
     private WebService webService;
 
 
+    private VideoPlayerFragment videoPlayerFragment;
+    private String VideoPlayerFragmentTag = "videoPlayerFragment";
 
 
-   public TextView getTextView() {
+    public TextView getTextView() {
         return textView;
     }
 
@@ -86,8 +90,8 @@ private GetNotification getNotification;
                 final DownloadVideo downloadLogTask = new DownloadVideo(getActivity());
 
 
-//                getNotification = new GetNotification();
-//                webService.postNotificationRequest(getNotification);
+                getNotification = new GetNotification(1, "2016-12-07 14:45:00", 0);
+                webService.postNotificationRequest(getNotification);
 
 
                 downloadLogTask.execute("https://s3.amazonaws.com/tekus/media/Arkbox.mp4");
@@ -132,9 +136,8 @@ private GetNotification getNotification;
                 // download the file
                 input = connection.getInputStream();
 
-                File video = new File(Environment.getExternalStorageDirectory().getPath() + "/Media/","Arkbox.mp4");
+                File video = new File(Environment.getExternalStorageDirectory().getPath() + "/Media/", "Arkbox.mp4");
                 output = new FileOutputStream(video);
-
 
 
                 byte data[] = new byte[4096];
@@ -181,7 +184,7 @@ private GetNotification getNotification;
             mWakeLock.acquire();
 
 
-            if (isExternalStorageReadable() && isExternalStorageWritable() ){
+            if (isExternalStorageReadable() && isExternalStorageWritable()) {
                 getMedeiatorageDir("Media");
             }
 
@@ -195,8 +198,9 @@ private GetNotification getNotification;
             getProgressBar().setIndeterminate(false);
             getProgressBar().setMax(100);
             getProgressBar().setProgress(progress[0]);
+//            webService.putNotification();
 
-            getTextView().setText(String.valueOf(progress[0]) + " %" );
+            getTextView().setText(String.valueOf(progress[0]) + " %");
         }
 
         @Override
@@ -208,7 +212,8 @@ private GetNotification getNotification;
                 Toast.makeText(context, "File downloaded", Toast.LENGTH_SHORT).show();
                 getProgressBar().setVisibility(View.GONE);
                 buttonDowloadVideo.setEnabled(true);
-
+                videoPlayerFragment = new VideoPlayerFragment();
+                addFragment(videoPlayerFragment, VideoPlayerFragmentTag);
             }
 
 
@@ -241,4 +246,29 @@ private GetNotification getNotification;
         }
         return file;
     }
+
+
+    public String localDateTime() {
+        //TODO: devolver el tiempo que se requiere
+        return "";
+    }
+
+
+    public void addFragment(VideoPlayerFragment fragment, String tag) {
+        FragmentManager fragmentManager = getFragmentManager();
+        android.support.v4.app.Fragment previousFragment = fragmentManager.findFragmentByTag(tag);
+
+        if (previousFragment == null) {
+            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+            fragmentTransaction.add(android.R.id.content, fragment, tag);
+            fragmentTransaction.addToBackStack(null);
+            fragmentTransaction.commitAllowingStateLoss();
+        } else {
+
+            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+            fragmentTransaction.show(previousFragment);
+        }
+    }
+
+
 }
