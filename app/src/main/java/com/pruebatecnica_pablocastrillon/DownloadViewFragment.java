@@ -264,21 +264,7 @@ public class DownloadViewFragment extends Fragment implements View.OnClickListen
     }
 
 
-    public void addFragment(VideoPlayerFragment fragment, String tag) {
-        FragmentManager fragmentManager = getFragmentManager();
-        android.support.v4.app.Fragment previousFragment = fragmentManager.findFragmentByTag(tag);
 
-        if (previousFragment == null) {
-            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-            fragmentTransaction.add(android.R.id.content, fragment, tag);
-            fragmentTransaction.addToBackStack(null);
-            fragmentTransaction.commitAllowingStateLoss();
-        } else {
-
-            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-            fragmentTransaction.show(previousFragment);
-        }
-    }
 
     public interface DownLoadFinishListener {
         void PlayVideo ();
